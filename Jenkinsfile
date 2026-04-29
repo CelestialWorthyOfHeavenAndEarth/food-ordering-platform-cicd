@@ -38,7 +38,7 @@ pipeline {
                     steps {
                         sh '''
                             # Check for hardcoded credentials
-                            if grep -rn "password\s*=\s*['\"][^'\"]*['\"]" app/src/ --include="*.php"; then
+                            if grep -rE "password[[:space:]]*=[[:space:]]*['\"][^'\"]*['\"]" app/src/ --include="*.php"; then
                                 echo "❌ Potential hardcoded credentials found"
                                 exit 1
                             fi
