@@ -57,9 +57,6 @@ pipeline {
         }
 
         stage('🚀 Deploy to EC2') {
-            when {
-                branch 'main'
-            }
             steps {
                 sh '''
                     echo "Deploying directly from Jenkins workspace..."
@@ -77,7 +74,6 @@ pipeline {
         }
 
         stage('✅ Post-Deploy Verify') {
-            when { branch 'main' }
             steps {
                 sh '''
                     sleep 10
