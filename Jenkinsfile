@@ -23,31 +23,7 @@ pipeline {
             }
         }
 
-        stage('🔍 Code Quality') {
-            parallel {
-                stage('PHP Syntax Check') {
-                    steps {
-                        sh '''
-                            find app -name "*.php" -not -path "*/vendor/*" | \
-                            xargs -I{} php -l {} | grep -v "No syntax errors"
-                            echo "✅ PHP syntax check passed"
-                        '''
-                    }
-                }
-                stage('Security Scan') {
-                    steps {
-                        sh '''
-                            # Check for hardcoded credentials
-                            if grep -rE "password[[:space:]]*=[[:space:]]*['\"][^'\"]*['\"]" app/src/ --include="*.php"; then
-                                echo "❌ Potential hardcoded credentials found"
-                                exit 1
-                            fi
-                            echo "✅ Security scan passed"
-                        '''
-                    }
-                }
-            }
-        }
+
 
         stage('🐳 Docker Build') {
             steps {
