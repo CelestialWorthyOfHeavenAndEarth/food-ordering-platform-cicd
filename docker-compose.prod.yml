@@ -42,6 +42,7 @@ services:
     volumes:
       - mysql_data_prod:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/seeds.sql:/docker-entrypoint-initdb.d/02_seeds.sql:ro
     # NO port exposure in production
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
