@@ -1,4 +1,4 @@
-# 🍽️ Feastly — Automated DevOps Food Ordering Platform
+# Feastly — Automated DevOps Food Ordering Platform
 
 ![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=jenkins)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker)
@@ -8,7 +8,7 @@ A production-grade, highly automated food ordering web platform. This project de
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
 This project was transformed from a traditional monolith into a resilient, containerized architecture deployed on an AWS EC2 instance.
 
@@ -22,25 +22,25 @@ This project was transformed from a traditional monolith into a resilient, conta
 
 ---
 
-## 🚀 CI/CD Pipeline (Jenkins)
+## CI/CD Pipeline (Jenkins)
 
 We built a "zero-touch" deployment pipeline. The moment code is pushed to the `main` branch, a GitHub Webhook triggers Jenkins to execute the following stages automatically:
 
-1.  **📥 Checkout SCM:** Pulls the latest source code from GitHub.
-2.  **🐳 Build Containers:** Utilizes Docker layer caching to build custom Nginx and PHP images efficiently.
-3.  **🧪 Container Test (Staging):** 
+1.  **Checkout SCM:** Pulls the latest source code from GitHub.
+2.  **Build Containers:** Utilizes Docker layer caching to build custom Nginx and PHP images efficiently.
+3.  **Container Test (Staging):** 
     *   Spins up an isolated staging environment.
     *   Waits for MySQL initialization.
     *   Runs HTTP health checks against the `/health` endpoint to verify the build is stable.
-4.  **🚀 Production Rollout:** 
+4.  **Production Rollout:** 
     *   Injects dynamic `.env` configurations securely.
     *   Executes zero-downtime deployment using `docker-compose up -d --build`.
-5.  **🧹 Automated Cleanup:** Cleans up orphaned images (`docker system prune`) to conserve disk space on the EC2 host.
-6.  **✅ Post-Deploy Verify:** Runs a final health check on the live production containers.
+5.  **Automated Cleanup:** Cleans up orphaned images (`docker system prune`) to conserve disk space on the EC2 host.
+6.  **Post-Deploy Verify:** Runs a final health check on the live production containers.
 
 ---
 
-## 🛠️ Infrastructure Solutions & DevOps Optimizations
+## Infrastructure Solutions & DevOps Optimizations
 
 Operating on a constrained environment (`t2.micro` with 1GB RAM) required specific architectural safeguards:
 
@@ -51,7 +51,7 @@ Operating on a constrained environment (`t2.micro` with 1GB RAM) required specif
 
 ---
 
-## 💻 Running the Project Locally
+## Running the Project Locally
 
 If you want to spin up the entire microservice architecture on your local machine, you only need Docker installed.
 
@@ -74,8 +74,3 @@ If you want to spin up the entire microservice architecture on your local machin
 
 4. **Access the application:**
    Navigate to `http://localhost` in your browser. The MySQL database will automatically seed itself with menu items upon initial startup.
-
----
-
-## 📝 Acknowledgements
-The frontend design and backend functionality of this application were originally based on the foundation provided by [Prachi060604](https://github.com/Prachi060604/Food-Ordering-Website-using-php), heavily refactored and containerized for cloud deployment.
