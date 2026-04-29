@@ -100,8 +100,5 @@ pipeline {
         failure {
             echo "❌ Pipeline ${env.BUILD_NUMBER} failed. Check logs above."
         }
-        always {
-            cleanWs()
-        }
     }
 }
