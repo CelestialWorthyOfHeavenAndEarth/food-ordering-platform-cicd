@@ -53,6 +53,9 @@ java -version
 # ---- Jenkins ----
 echo "[6/7] Installing Jenkins..."
 curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+# Fallback to direct keyserver if curl downloaded an invalid/empty key
+gpg --keyserver keyserver.ubuntu.com --recv-keys 7198F4B714ABFC68 || true
+gpg --export 7198F4B714ABFC68 | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" \
     > /etc/apt/sources.list.d/jenkins.list
 apt-get update -qq && apt-get install -y jenkins
