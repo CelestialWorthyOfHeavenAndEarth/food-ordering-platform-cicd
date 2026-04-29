@@ -89,13 +89,8 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "Deploying directly on EC2 host..."
+                    echo "Deploying directly from Jenkins workspace..."
                     
-                    # Ensure app directory exists
-                    sudo mkdir -p /home/ubuntu/feastly
-                    sudo cp -r * /home/ubuntu/feastly/
-                    
-                    cd /home/ubuntu/feastly
                     cp .env.example .env
                     
                     # Stop old containers and start new ones
