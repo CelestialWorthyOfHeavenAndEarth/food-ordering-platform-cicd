@@ -38,8 +38,8 @@ pipeline {
         stage('🧪 Container Test') {
             steps {
                 sh '''
-                    cp .env.example .env.test
-                    docker-compose -f docker-compose.prod.yml --env-file .env.test up -d
+                    cp .env.example .env
+                    docker-compose -f docker-compose.prod.yml up -d
                     sleep 15
 
                     # Health check
@@ -52,7 +52,6 @@ pipeline {
                     fi
                     echo "✅ Container health check passed (HTTP 200)"
                     docker-compose -f docker-compose.prod.yml down
-                    rm -f .env.test
                 '''
             }
         }
