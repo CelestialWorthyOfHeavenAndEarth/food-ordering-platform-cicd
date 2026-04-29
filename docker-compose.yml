@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  nginx:
+    build: ./docker/nginx
+    container_name: feastly_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www/html:ro
+    depends_on:
+      - php
+    networks:
+      - feastly_net
+    restart: unless-stopped
+
+  php:
+    build: ./docker/php
+    container_name: feastly_php
+    volumes:
+      - ./app:/var/www/html
+      - ./logs/php:/var/log/php
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - feastly_net
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: feastly_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootpassword}
+      MYSQL_DATABASE:      ${DB_NAME:-food_ordering_db}
+      MYSQL_USER:          ${DB_USER:-food_user}
+      MYSQL_PASSWORD:      ${DB_PASS:-password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/seeds.sql:/docker-entrypoint-initdb.d/02_seeds.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - feastly_net
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  feastly_net:
+    driver: bridge

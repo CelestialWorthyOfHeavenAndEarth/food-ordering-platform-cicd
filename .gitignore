@@ -1,0 +1,28 @@
+# Environment - NEVER commit
+.env
+.env.local
+.env.production
+
+# Dependencies
+vendor/
+node_modules/
+
+# Build artifacts
+*.log
+logs/
+
+# Docker volumes
+mysql_data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (user content)
+app/public/uploads/

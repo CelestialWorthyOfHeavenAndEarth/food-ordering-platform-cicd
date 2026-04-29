@@ -1,0 +1,70 @@
+# 🍽️ Food Ordering Platform — Full Implementation Prompt
+### DevOps + Production-Grade Frontend + CI/CD Pipeline on AWS
+## 📁 Target Project Structure
+## 🎨 PHASE 1 — Frontend Complete Overhaul
+### Design Direction
+### 1.1 — Global CSS Design System
+### 1.2 — Animation System
+### 1.3 — Navigation Component
+### 1.4 — Hero Section (index.php)
+### 1.5 — Menu Card Component
+### 1.6 — Cart Drawer Component
+### 1.7 — Cart JavaScript
+## 🔧 PHASE 2 — Backend Refactoring
+### 2.1 — Environment Configuration
+# Application
+# Database
+# Session
+# Upload limits
+### 2.2 — Database Class (PDO)
+### 2.3 — Auth System
+### 2.4 — Database Schema
+## 🐳 PHASE 3 — Dockerization
+### 3.1 — PHP Dockerfile
+# Install dependencies
+# PHP configuration
+# Set working directory
+# Run as www-data
+### 3.2 — Nginx Dockerfile + Config
+### 3.3 — Docker Compose (Development)
+### 3.4 — Docker Compose (Production)
+## ⚙️ PHASE 4 — CI/CD Pipeline (Jenkins)
+### 4.1 — Jenkinsfile
+## 🖥️ PHASE 5 — AWS EC2 Setup Scripts
+### 5.1 — Server Bootstrap Script
+#!/bin/bash
+# ================================================
+# EC2 Ubuntu Server Bootstrap
+# Run ONCE on fresh EC2 instance as ubuntu user
+# Usage: sudo bash install-server.sh
+# ================================================
+# ---- System Update ----
+# ---- Essential Tools ----
+# ---- Docker ----
+# ---- Docker Compose ----
+# ---- Java (for Jenkins) ----
+# ---- Jenkins ----
+# ---- Firewall ----
+# ---- App Directory ----
+# ---- fail2ban ----
+### 5.2 — Deploy Script
+#!/bin/bash
+# Called by Jenkinsfile on EC2 during deployment
+### 5.3 — Health Check Script
+#!/bin/bash
+# Run as a cron job: */5 * * * * /home/ubuntu/feastly/scripts/health-check.sh
+## 🔒 PHASE 6 — Security & Production Hardening
+### 6.1 — .gitignore
+# Environment - NEVER commit
+# Dependencies
+# Build artifacts
+# Docker volumes
+# IDE
+# OS
+# Uploads (user content)
+### 6.2 — Security Middleware
+## 📋 PHASE 7 — Jenkins Configuration Steps (Manual)
+## 📦 PHASE 8 — EC2 Instance Configuration (AWS Console)
+## 🚦 PHASE 9 — Main.js (Scroll Reveal + Nav + Toasts)
+## ✅ Final Checklist Before Going Live
+## 📝 Notes for Cursor / Antigravity
