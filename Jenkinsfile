@@ -30,9 +30,7 @@ pipeline {
                 sh '''
                     echo "Building Docker images..."
                     docker-compose -f docker-compose.prod.yml build --no-cache
-                    docker tag feastly_php  ${DOCKER_IMAGE}-php
-                    docker tag feastly_nginx ${DOCKER_IMAGE}-nginx
-                    echo "✅ Docker build complete: ${DOCKER_IMAGE}"
+                    echo "✅ Docker build complete"
                 '''
             }
         }
