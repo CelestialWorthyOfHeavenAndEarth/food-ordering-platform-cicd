@@ -1,6 +1,6 @@
 <?php
 session_start([
-    'cookie_secure'   => true,
+    'cookie_secure' => false,
     'cookie_httponly' => true,
     'cookie_samesite' => 'Strict',
     'use_strict_mode' => true,
