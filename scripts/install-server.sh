@@ -46,8 +46,8 @@ chmod +x /usr/local/bin/docker-compose
 echo "Docker Compose: $(docker-compose --version)"
 
 # ---- Java (for Jenkins) ----
-echo "[5/7] Installing Java 17..."
-apt-get install -y openjdk-17-jdk
+echo "[5/7] Installing Java 21..."
+apt-get install -y openjdk-21-jdk
 java -version
 
 # ---- Jenkins ----
