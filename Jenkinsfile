@@ -4,9 +4,6 @@ pipeline {
     environment {
         APP_NAME     = 'feastly'
         DOCKER_IMAGE = "${APP_NAME}:${BUILD_NUMBER}"
-        DEPLOY_HOST  = credentials('ec2-host')
-        SSH_KEY      = credentials('ec2-ssh-key')
-        ENV_FILE     = credentials('app-env-file')
     }
 
     options {
@@ -67,7 +64,7 @@ pipeline {
         stage('🧪 Container Test') {
             steps {
                 sh '''
-                    cp ${ENV_FILE} .env.test
+                    cp .env.example .env.test
                     docker-compose -f docker-compose.prod.yml --env-file .env.test up -d
                     sleep 15
 
@@ -91,24 +88,23 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sshagent(['ec2-ssh-key']) {
-                    sh '''
-                        echo "Deploying to EC2: ${DEPLOY_HOST}"
+                sh '''
+                    echo "Deploying directly on EC2 host..."
+                    
+                    # Ensure app directory exists
+                    sudo mkdir -p /home/ubuntu/feastly
+                    sudo cp -r * /home/ubuntu/feastly/
+                    
+                    cd /home/ubuntu/feastly
+                    cp .env.example .env
+                    
+                    # Stop old containers and start new ones
+                    docker-compose -f docker-compose.prod.yml down || true
+                    docker-compose -f docker-compose.prod.yml up -d --build
+                    docker system prune -f
 
-                        # Copy env file
-                        scp -o StrictHostKeyChecking=no ${ENV_FILE} ubuntu@${DEPLOY_HOST}:/home/ubuntu/feastly/.env
-
-                        # Deploy via remote script
-                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} \
-                            "cd /home/ubuntu/feastly && \
-                             git pull origin main && \
-                             docker-compose -f docker-compose.prod.yml pull && \
-                             docker-compose -f docker-compose.prod.yml up -d --build && \
-                             docker system prune -f"
-
-                        echo "✅ Deployment complete!"
-                    '''
-                }
+                    echo "✅ Deployment complete!"
+                '''
             }
         }
 
@@ -117,7 +113,7 @@ pipeline {
             steps {
                 sh '''
                     sleep 10
-                    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${DEPLOY_HOST}/health)
+                    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/health)
                     if [ "$HTTP_CODE" = "200" ]; then
                         echo "✅ Production health check passed"
                     else
