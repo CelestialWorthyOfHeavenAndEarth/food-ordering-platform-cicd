@@ -40,8 +40,7 @@ $user_logged  = isset($_SESSION['user_id']);
             <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
           </button>
           <div class="nav__dropdown" id="userDropdown">
-            <a href="/dashboard.php">My Orders</a>
-            <a href="/profile.php">Profile</a>
+            <a href="/dashboard.php">Profile & Orders</a>
             <div class="divider" style="margin: 8px 0;"></div>
             <a href="/logout.php" class="text-coral">Sign Out</a>
           </div>
