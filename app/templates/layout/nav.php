@@ -49,13 +49,19 @@ $user_logged  = isset($_SESSION['user_id']);
       </div>
 
       <?php if ($user_logged): ?>
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <a href="#admin-panel" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📊 Admin</a>
+        <?php endif; ?>
         <a href="/dashboard.php" class="btn btn-primary btn--sm hide-mobile">Dashboard</a>
         <div class="nav__user-menu">
           <button class="nav__avatar" id="userMenuToggle">
             <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
           </button>
           <div class="nav__dropdown" id="userDropdown">
-            <a href="/dashboard.php">Profile & Orders</a>
+            <a href="/dashboard.php">Profile &amp; Orders</a>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+            <a href="/admin-insights.php">Full Analytics</a>
+            <?php endif; ?>
             <div class="divider" style="margin: 8px 0;"></div>
             <a href="/logout.php" class="text-coral">Sign Out</a>
           </div>
@@ -155,13 +161,7 @@ if (localStorage.getItem('eco_mode') === '1') {
   document.body.classList.add('eco-active');
   document.addEventListener('DOMContentLoaded', () => applyEcoFilter(true));
 }
-// On page load, restore preference
-if (localStorage.getItem('eco_mode') === '1') {
-  const btn = document.getElementById('eco-toggle');
-  if(btn) btn.textContent = '🌿 Eco: ON';
-  document.body.classList.add('eco-active');
-  document.addEventListener('DOMContentLoaded', () => applyEcoFilter(true));
-}
+
 
 // Admin Alerts Polling
 setInterval(async () => {

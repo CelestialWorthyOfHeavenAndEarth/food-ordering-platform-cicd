@@ -14,7 +14,7 @@ session_start([
 
 $data = [];
 
-$pdo = Database::getConnection();
+$pdo = Database::getInstance()->getConnection();
 
 // Most ordered items last 30 days
 $data['top_items'] = $pdo->query("
@@ -62,4 +62,8 @@ if (!empty($data['revenue_trend'])) {
 }
 
 $data['ai_insights'] = $insights;
+
+// User count
+$data['user_count'] = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+
 echo json_encode($data);
