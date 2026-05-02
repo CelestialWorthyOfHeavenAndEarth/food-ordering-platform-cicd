@@ -1,0 +1,7 @@
+ALTER TABLE restaurants
+  ADD COLUMN latitude DECIMAL(10,8) DEFAULT 0,
+  ADD COLUMN longitude DECIMAL(11,8) DEFAULT 0,
+  ADD COLUMN avg_delivery_time INT DEFAULT 30,
+  ADD COLUMN avg_rating DECIMAL(3,2) DEFAULT 4.0,
+  ADD COLUMN is_eco_friendly TINYINT(1) DEFAULT 0,
+  ADD COLUMN eco_score INT DEFAULT 0;

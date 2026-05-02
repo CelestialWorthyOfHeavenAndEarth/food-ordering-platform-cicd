@@ -98,6 +98,53 @@ $featured_items = $menuController->getFeatured(3);
     </div>
   </section>
 
+  <!-- RECOMMENDATIONS (Feature 1) -->
+  <?php if ($user_logged): ?>
+  <section id="recommendations" class="recommendations-section section-gap" style="background: var(--surface-light);">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="badge badge-amber">For You</span>
+        <h2>✨ Recommended For You</h2>
+        <p>Based on your history, time of day, and current weather.</p>
+      </div>
+      <div id="rec-cards" class="menu-grid stagger">
+        <!-- JS will populate this -->
+      </div>
+    </div>
+  </section>
+  <script>
+  (async () => {
+    const userId = <?= $_SESSION['user_id'] ?>;
+    if (!userId) return;
+    try {
+      const res  = await fetch(`/api/recommend.php?user_id=${userId}`);
+      const data = await res.json();
+      const grid = document.getElementById('rec-cards');
+      if (data && data.length) {
+          grid.innerHTML = data.map(dish => `
+            <div class="menu-card card reveal">
+              <div class="menu-card__image-wrap">
+                <img src="${dish.image_url || '/assets/images/default.png'}" alt="${dish.dish_name}" class="menu-card__image">
+              </div>
+              <div class="menu-card__content">
+                <h3 class="menu-card__title">${dish.dish_name}</h3>
+                <div class="menu-card__meta">
+                  <span class="menu-card__price">₹${dish.price}</span>
+                </div>
+                <button class="btn btn-primary btn--sm" onclick="Cart.addItem(${dish.id}, '${dish.dish_name.replace(/'/g,"\\'")}', ${dish.price})" style="width:100%; margin-top:1rem;">Add to Cart</button>
+              </div>
+            </div>`).join('');
+      } else {
+          document.getElementById('recommendations').style.display = 'none';
+      }
+    } catch (e) {
+      console.error(e);
+      document.getElementById('recommendations').style.display = 'none';
+    }
+  })();
+  </script>
+  <?php endif; ?>
+
   <!-- HOW IT WORKS -->
   <section class="how-it-works section-gap" id="how-it-works">
     <div class="container">
@@ -125,6 +172,20 @@ $featured_items = $menuController->getFeatured(3);
             <p><?= $step['desc'] ?></p>
           </div>
         <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEARBY RESTAURANTS (Feature 2) -->
+  <section class="nearby-restaurants section-gap" id="nearby-restaurants" style="background: var(--surface-light); display: none;">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="badge badge-amber">Smart Ranking</span>
+        <h2>Nearby Kitchens</h2>
+        <p>Ranked by ratings, delivery speed, and distance to you.</p>
+      </div>
+      <div id="ranked-restaurants" class="menu-grid stagger">
+        <!-- JS will populate this -->
       </div>
     </div>
   </section>
@@ -158,5 +219,46 @@ $featured_items = $menuController->getFeatured(3);
 
   <script src="/assets/js/main.js"></script>
   <script src="/assets/js/cart.js"></script>
+  <script>
+    function renderRestaurantList(data) {
+      const cont = document.getElementById('ranked-restaurants');
+      const section = document.getElementById('nearby-restaurants');
+      if (!data || data.length === 0) return;
+      section.style.display = 'block';
+      cont.innerHTML = data.map(r => `
+        <div class="menu-card card reveal restaurant-card" data-eco="${r.is_eco_friendly ? '1' : '0'}">
+          ${r.is_eco_friendly ? '<span class="badge badge-amber" style="position:absolute; top:10px; right:10px; z-index:2;">🌿 Eco Friendly</span>' : ''}
+          <div class="menu-card__content" style="padding: 1.5rem;">
+            <h3 class="menu-card__title">${r.name}</h3>
+            <p class="menu-card__desc">Distance: ${r.distance_km} km • Delivery: ${r.avg_delivery_time} mins</p>
+            <div class="menu-card__meta">
+              <span>★ ${r.avg_rating}</span>
+              <span style="color: var(--accent-amber);">Score: ${r.smart_score}</span>
+            </div>
+            ${r.distance_km ? `<small class="carbon-impact" style="display:block; margin-top:10px; color:var(--text-muted);">~${(r.distance_km * 0.12).toFixed(2)} kg CO₂ delivery impact</small>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadRankedRestaurants() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const { latitude: lat, longitude: lon } = pos.coords;
+          const res  = await fetch(`/api/rank-restaurants.php?lat=${lat}&lon=${lon}`);
+          const data = await res.json();
+          renderRestaurantList(data);
+        }, async () => {
+          // Fallback: load without geo
+          const res = await fetch('/api/rank-restaurants.php');
+          const data = await res.json();
+          renderRestaurantList(data);
+        });
+      } else {
+        fetch('/api/rank-restaurants.php').then(r => r.json()).then(renderRestaurantList);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadRankedRestaurants);
+  </script>
 </body>
 </html>

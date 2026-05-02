@@ -35,6 +35,24 @@ pipeline {
             }
         }
 
+        stage('🛡️ Vulnerability Scan') {
+            steps {
+                sh '''
+                    echo "Running Trivy vulnerability scanner..."
+                    # Check if trivy is installed, if not try to install or run via docker
+                    if ! command -v trivy &> /dev/null; then
+                        echo "Trivy not found. Running via Docker..."
+                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --severity HIGH,CRITICAL feastly-pipeline-php:latest
+                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --severity HIGH,CRITICAL feastly-pipeline-nginx:latest
+                    else
+                        trivy image --severity HIGH,CRITICAL feastly-pipeline-php:latest
+                        trivy image --severity HIGH,CRITICAL feastly-pipeline-nginx:latest
+                    fi
+                    echo "✅ Scan complete"
+                '''
+            }
+        }
+
         stage('🧪 Container Test') {
             steps {
                 sh '''

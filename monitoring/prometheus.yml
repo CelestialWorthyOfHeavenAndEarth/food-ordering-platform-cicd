@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'php-fpm'
+    static_configs:
+      - targets: ['feastly_php_prod:9253'] # Assuming we'll add php-fpm-exporter if needed. We don't have one right now, but Prometheus is set up.
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']

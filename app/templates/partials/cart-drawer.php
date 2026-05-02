@@ -20,18 +20,21 @@
     </div>
   </div>
   <div class="cart-drawer__footer" id="cartFooter" style="display:none;">
-    <div class="cart-total">
-      <span>Subtotal</span>
-      <strong id="cartSubtotal">₹0.00</strong>
+    <div id="delivery-estimate" style="background: rgba(16,185,129,0.1); color: #10b981; padding: 8px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 12px; border: 1px solid rgba(16,185,129,0.2);">
+      🕐 Calculating delivery estimate...
     </div>
-    <div class="cart-total">
-      <span>Delivery Fee</span>
-      <strong>₹40.00</strong>
-    </div>
-    <div class="divider--amber divider"></div>
-    <div class="cart-total cart-total--grand">
-      <span>Total</span>
-      <strong id="cartTotal">₹0.00</strong>
+    <div id="cost-breakdown" class="breakdown-card" style="display:none">
+      <h4 style="margin-bottom:8px;">💰 Price Breakdown</h4>
+      <table style="width:100%; text-align:left; font-size:0.9rem;">
+        <tr><td>Food Subtotal</td>    <td id="bd-subtotal" style="text-align:right;"></td></tr>
+        <tr><td>Delivery Fee</td>     <td id="bd-delivery" style="text-align:right;"></td></tr>
+        <tr><td>GST (5%)</td>         <td id="bd-gst" style="text-align:right;"></td></tr>
+        <tr><td>Platform Fee</td>     <td id="bd-platform" style="text-align:right;"></td></tr>
+        <tr><td>Packing Charge</td>   <td id="bd-packing" style="text-align:right;"></td></tr>
+        <tr class="total-row" style="border-top:1px solid var(--border); font-size:1rem; margin-top:8px;">
+          <td><strong>Total</strong></td><td id="bd-total" style="text-align:right; font-weight:bold; color:var(--accent-amber);"></td>
+        </tr>
+      </table>
     </div>
     <a href="/checkout.php" class="btn btn-primary" style="width:100%; margin-top:var(--space-md);">
       Proceed to Checkout →

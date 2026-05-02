@@ -25,3 +25,80 @@ INSERT INTO menu_items (category_id, name, description, price, is_popular, is_ve
 -- Default password is 'password'
 INSERT INTO users (name, email, password_hash, role) VALUES
 ('Admin User', 'admin@feastly.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+CREATE TABLE IF NOT EXISTS restaurants (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  is_active TINYINT(1) DEFAULT 1
+);
+
+INSERT INTO restaurants (name) VALUES ('Feastly Main Kitchen');
+
+ALTER TABLE menu_items ADD COLUMN restaurant_id INT DEFAULT 1;
+ALTER TABLE orders ADD COLUMN restaurant_id INT DEFAULT 1;
+CREATE TABLE IF NOT EXISTS user_order_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  dish_id INT NOT NULL,
+  ordered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  time_of_day ENUM('morning','afternoon','evening','night') NOT NULL,
+  weather_condition VARCHAR(50),
+  INDEX idx_user_time (user_id, time_of_day)
+);
+ALTER TABLE restaurants
+  ADD COLUMN latitude DECIMAL(10,8) DEFAULT 0,
+  ADD COLUMN longitude DECIMAL(11,8) DEFAULT 0,
+  ADD COLUMN avg_delivery_time INT DEFAULT 30,
+  ADD COLUMN avg_rating DECIMAL(3,2) DEFAULT 4.0,
+  ADD COLUMN is_eco_friendly TINYINT(1) DEFAULT 0,
+  ADD COLUMN eco_score INT DEFAULT 0;
+CREATE TABLE IF NOT EXISTS order_status (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  status ENUM('placed','confirmed','preparing','cooking','out_for_delivery','delivered') DEFAULT 'placed',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order (order_id)
+);
+CREATE TABLE IF NOT EXISTS meal_combos (
+  combo_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  items JSON NOT NULL,
+  base_price DECIMAL(8,2) NOT NULL,
+  discount_percentage DECIMAL(4,2) DEFAULT 0,
+  final_price DECIMAL(8,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS pricing_config (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  config_key VARCHAR(50) UNIQUE NOT NULL,
+  config_value DECIMAL(8,2) NOT NULL,
+  description VARCHAR(255)
+);
+INSERT INTO pricing_config (config_key, config_value, description) VALUES
+  ('gst_percent', 5.00, 'GST on food items'),
+  ('platform_fee', 5.00, 'Fixed platform fee per order'),
+  ('packing_charge', 10.00, 'Packing charge per restaurant'),
+  ('base_delivery_fee', 30.00, 'Base delivery fee'),
+  ('per_km_rate', 5.00, 'Additional fee per km beyond 3km');
+ALTER TABLE menu_items
+  ADD COLUMN tags VARCHAR(255) DEFAULT '',
+  ADD COLUMN packaging_type ENUM('standard','minimal','plastic-free') DEFAULT 'standard';
+ALTER TABLE menu_items ADD FULLTEXT INDEX ft_search (name, description, tags);
+CREATE TABLE IF NOT EXISTS admin_alerts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  alert_type ENUM('low_rating','inactivity','anomaly') NOT NULL,
+  restaurant_id INT,
+  message TEXT NOT NULL,
+  is_read TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE OR REPLACE VIEW restaurant_load_metrics AS
+SELECT
+  r.id AS restaurant_id,
+  r.name,
+  r.avg_delivery_time,
+  COUNT(o.id) AS orders_last_hour,
+  AVG(COUNT(o.id)) OVER (PARTITION BY r.id) AS avg_hourly_orders
+FROM restaurants r
+LEFT JOIN orders o ON o.restaurant_id = r.id
+  AND o.created_at >= NOW() - INTERVAL 1 HOUR
+GROUP BY r.id, r.name, r.avg_delivery_time;

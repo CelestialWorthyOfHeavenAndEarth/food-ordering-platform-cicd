@@ -17,9 +17,16 @@ $user_logged  = isset($_SESSION['user_id']);
     <!-- Desktop Links -->
     <ul class="nav__links hide-mobile">
       <li><a href="/menu.php"     class="nav__link <?= $current_page==='menu'?'active':'' ?>">Menu</a></li>
+      <li><a href="/meal-builder.php" class="nav__link <?= $current_page==='meal-builder'?'active':'' ?>">Combos</a></li>
       <li><a href="/about.php"    class="nav__link <?= $current_page==='about'?'active':'' ?>">About</a></li>
       <li><a href="/contact.php"  class="nav__link <?= $current_page==='contact'?'active':'' ?>">Contact</a></li>
     </ul>
+
+    <!-- Smart Search -->
+    <div class="smart-search hide-mobile" style="position:relative; margin-left:1rem; margin-right:1rem; flex-grow:1; max-width:300px;">
+      <input type="text" id="search-input" placeholder="Try 'spicy chicken under 200'..." style="width:100%; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:0.9rem;">
+      <div id="search-results" class="results-dropdown" style="position:absolute; top:100%; left:0; right:0; background:var(--surface-light); border-radius:8px; margin-top:8px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:100; max-height:400px; overflow-y:auto; display:none;"></div>
+    </div>
 
     <!-- Actions -->
     <div class="nav__actions">
@@ -32,6 +39,14 @@ $user_logged  = isset($_SESSION['user_id']);
           <span class="nav__cart-badge"><?= $cart_count ?></span>
         <?php endif; ?>
       </button>
+
+      <!-- Eco Mode Toggle -->
+      <button id="eco-toggle" class="btn btn-ghost hide-mobile" onclick="toggleEcoMode()" style="font-size:0.9rem; padding: 4px 8px;">🌱 Eco: OFF</button>
+
+      <!-- Admin Alert Badge -->
+      <div id="alert-badge" style="display:none; margin-left: 10px;" class="alert-icon">
+        <a href="/admin-insights.php" style="text-decoration:none;">🔔 <span id="alert-count" style="background:var(--accent-coral); color:white; border-radius:50%; padding:2px 6px; font-size:0.75rem;">0</span></a>
+      </div>
 
       <?php if ($user_logged): ?>
         <a href="/dashboard.php" class="btn btn-primary btn--sm hide-mobile">Dashboard</a>
@@ -61,6 +76,7 @@ $user_logged  = isset($_SESSION['user_id']);
   <div class="nav__mobile-menu" id="mobileMenu">
     <ul>
       <li><a href="/menu.php">Menu</a></li>
+      <li><a href="/meal-builder.php">Combos</a></li>
       <li><a href="/about.php">About</a></li>
       <li><a href="/contact.php">Contact</a></li>
       <?php if (!$user_logged): ?>
@@ -70,3 +86,97 @@ $user_logged  = isset($_SESSION['user_id']);
     </ul>
   </div>
 </header>
+
+<style>
+.smart-search .result-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; }
+.smart-search .result-item:hover { background: rgba(255,255,255,0.05); }
+.smart-search .result-item strong { display: block; color: var(--accent-amber); margin-bottom: 4px; }
+.smart-search .result-item small { display: block; font-size: 0.75rem; color: var(--text-muted); }
+</style>
+
+<script>
+let debounceTimer;
+document.getElementById('search-input')?.addEventListener('input', function() {
+  clearTimeout(debounceTimer);
+  const q = this.value.trim();
+  const div = document.getElementById('search-results');
+  if (!q) { 
+    div.innerHTML = ''; 
+    div.style.display = 'none';
+    return; 
+  }
+  debounceTimer = setTimeout(async () => {
+    try {
+      const res  = await fetch(`/api/search.php?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      div.style.display = 'block';
+      div.innerHTML = data.length
+        ? data.map(i => `<div class="result-item" onclick="Cart.addItem(${i.id}, '${i.dish_name.replace(/'/g,"\\'")}', ${i.price}); document.getElementById('search-results').style.display='none'; document.getElementById('search-input').value='';">
+             <strong>${i.dish_name}</strong> — ₹${i.price}
+             <small>${i.tags || 'Standard'}</small>
+           </div>`).join('')
+        : '<div class="result-item">No results found</div>';
+    } catch(e) {
+      console.error(e);
+    }
+  }, 300);
+});
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.smart-search')) {
+        const div = document.getElementById('search-results');
+        if(div) div.style.display = 'none';
+    }
+});
+
+// Eco Mode Toggle
+function toggleEcoMode() {
+  const active = localStorage.getItem('eco_mode') === '1';
+  localStorage.setItem('eco_mode', active ? '0' : '1');
+  document.getElementById('eco-toggle').textContent = active ? '🌱 Eco: OFF' : '🌿 Eco: ON';
+  document.body.classList.toggle('eco-active', !active);
+  applyEcoFilter(!active);
+}
+
+function applyEcoFilter(active) {
+  document.querySelectorAll('.restaurant-card').forEach(card => {
+    const isEco = card.dataset.eco === '1';
+    card.classList.toggle('eco-highlight', active && isEco);
+    if (active && !isEco) card.style.opacity = '0.5';
+    else card.style.opacity = '1';
+  });
+}
+
+// On page load, restore preference
+if (localStorage.getItem('eco_mode') === '1') {
+  const btn = document.getElementById('eco-toggle');
+  if(btn) btn.textContent = '🌿 Eco: ON';
+  document.body.classList.add('eco-active');
+  document.addEventListener('DOMContentLoaded', () => applyEcoFilter(true));
+}
+// On page load, restore preference
+if (localStorage.getItem('eco_mode') === '1') {
+  const btn = document.getElementById('eco-toggle');
+  if(btn) btn.textContent = '🌿 Eco: ON';
+  document.body.classList.add('eco-active');
+  document.addEventListener('DOMContentLoaded', () => applyEcoFilter(true));
+}
+
+// Admin Alerts Polling
+setInterval(async () => {
+  try {
+    const res  = await fetch('/api/alerts.php?action=list');
+    const data = await res.json();
+    const badge = document.getElementById('alert-badge');
+    if (data.count > 0 && badge) {
+      document.getElementById('alert-count').textContent = data.count;
+      badge.style.display = 'inline-block';
+    } else if (badge) {
+      badge.style.display = 'none';
+    }
+  } catch(e) {
+    console.error("Alerts polling failed", e);
+  }
+}, 60000); // check every minute
+</script>

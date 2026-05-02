@@ -76,6 +76,7 @@ if (isset($_GET['logout'])) {
                   <th style="padding: 12px 0;">Date</th>
                   <th style="padding: 12px 0;">Status</th>
                   <th style="padding: 12px 0;">Total</th>
+                  <th style="padding: 12px 0; text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -89,6 +90,9 @@ if (isset($_GET['logout'])) {
                       </span>
                     </td>
                     <td style="padding: 16px 0; font-weight: 600;">₹<?= number_format($order['total_amount'], 2) ?></td>
+                    <td style="padding: 16px 0; text-align: right;">
+                      <a href="/order-track.php?order_id=<?= $order['id'] ?>" class="btn btn-secondary btn--sm" style="padding: 4px 12px; font-size: 0.8rem;">Track</a>
+                    </td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>

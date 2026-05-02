@@ -82,8 +82,7 @@ const Cart = (() => {
     footer  && (footer.style.display = 'block');
 
     const subtotal = getSubtotal();
-    document.getElementById('cartSubtotal').textContent = `₹${subtotal.toFixed(2)}`;
-    document.getElementById('cartTotal').textContent    = `₹${(subtotal + DELIVERY_FEE).toFixed(2)}`;
+    loadBreakdown(subtotal, 2); // Default 2km for preview
 
     const html = items.map(item => `
       <div class="cart-item" data-id="${item.id}">
@@ -126,11 +125,40 @@ const Cart = (() => {
     });
   }
 
+  async function loadBreakdown(subtotal, distanceKm) {
+    if (subtotal <= 0) return;
+    try {
+      const res  = await fetch(`/api/cost-breakdown.php?subtotal=${subtotal}&distance_km=${distanceKm}`);
+      const data = await res.json();
+      document.getElementById('bd-subtotal').textContent  = '₹' + data.subtotal.toFixed(2);
+      document.getElementById('bd-delivery').textContent  = '₹' + data.delivery_fee.toFixed(2);
+      document.getElementById('bd-gst').textContent       = '₹' + data.gst.toFixed(2);
+      document.getElementById('bd-platform').textContent  = '₹' + data.platform_fee.toFixed(2);
+      document.getElementById('bd-packing').textContent   = '₹' + data.packing_charge.toFixed(2);
+      document.getElementById('bd-total').textContent     = '₹' + data.total.toFixed(2);
+      document.getElementById('cost-breakdown').style.display = 'block';
+    } catch (e) {
+      console.error("Failed to load cost breakdown", e);
+    }
+  }
+
+  async function showDeliveryEstimate(restaurantId = 1, distanceKm = 2) {
+    try {
+      const res  = await fetch(`/api/predict-time.php?restaurant_id=${restaurantId}&distance_km=${distanceKm}`);
+      const data = await res.json();
+      const el = document.getElementById('delivery-estimate');
+      if(el) el.textContent = `🕐 Estimated Delivery: ${data.range}`;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
   // Init
   updateBadge();
   render();
+  showDeliveryEstimate();
 
-  return { addItem, decrease, remove, openDrawer, closeDrawer, getItems: () => items, syncToServer };
+  return { addItem, decrease, remove, openDrawer, closeDrawer, getItems: () => items, syncToServer, loadBreakdown, showDeliveryEstimate };
 })();
 
 // Cart drawer toggle

@@ -25,6 +25,24 @@ class Order {
             $stmtItem->execute([$orderId, $item['id'], $item['quantity'], $item['price']]);
         }
 
+        $stmtStatus = $db->prepare("INSERT INTO order_status (order_id, status) VALUES (?, 'placed')");
+        $stmtStatus->execute([$orderId]);
+
+        // Feature 1: Track history for AI
+        $hour = (int)date('H');
+        $timeSlot = 'night';
+        if ($hour >= 6 && $hour < 12) $timeSlot = 'morning';
+        elseif ($hour >= 12 && $hour < 17) $timeSlot = 'afternoon';
+        elseif ($hour >= 17 && $hour < 21) $timeSlot = 'evening';
+
+        $stmtHist = $db->prepare("INSERT INTO user_order_history (user_id, dish_id, time_of_day) VALUES (?, ?, ?)");
+        foreach ($data['items'] as $item) {
+            // we only track actual menu items, ignore combo items for now or insert if valid id
+            if (is_numeric($item['id'])) {
+                $stmtHist->execute([$userId, $item['id'], $timeSlot]);
+            }
+        }
+
         return $orderId;
     }
 
