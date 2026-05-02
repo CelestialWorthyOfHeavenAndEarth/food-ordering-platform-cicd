@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../src/config/Database.php';
 header('Content-Type: application/json');
 
 $action = $_GET['action'] ?? 'list';
-$pdo = Database::getInstance()->getConnection();
+$pdo = Database::getConnection();
 
 if ($action === 'list') {
   $alerts = $pdo->query("

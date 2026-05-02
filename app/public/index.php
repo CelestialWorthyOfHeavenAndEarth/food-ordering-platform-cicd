@@ -17,7 +17,7 @@ $menuController = new MenuController();
 $featured_items = $menuController->getFeatured(6);
 
 // Load restaurants from DB
-$db = Database::getInstance()->getConnection();
+$db = Database::getConnection();
 $restaurants = $db->query("SELECT * FROM restaurants WHERE is_active = 1 ORDER BY avg_rating DESC")->fetchAll(PDO::FETCH_ASSOC);
 
 $user_logged = isset($_SESSION['user_id']);

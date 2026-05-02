@@ -14,7 +14,7 @@ session_start([
 
 $data = [];
 
-$pdo = Database::getInstance()->getConnection();
+$pdo = Database::getConnection();
 
 // Most ordered items last 30 days
 $data['top_items'] = $pdo->query("
