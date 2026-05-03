@@ -30,6 +30,7 @@ $user_logged  = isset($_SESSION['user_id']);
 
     <!-- Actions -->
     <div class="nav__actions">
+      <?php if (!$user_logged || ($_SESSION['role']??'') !== 'admin'): ?>
       <button class="nav__cart-btn btn btn-ghost btn--icon" id="cartToggle" aria-label="Cart">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -39,9 +40,12 @@ $user_logged  = isset($_SESSION['user_id']);
           <span class="nav__cart-badge"><?= $cart_count ?></span>
         <?php endif; ?>
       </button>
+      <?php endif; ?>
 
       <!-- Eco Mode Toggle -->
+      <?php if (!$user_logged || ($_SESSION['role']??'') !== 'admin'): ?>
       <button id="eco-toggle" class="btn btn-ghost hide-mobile" onclick="toggleEcoMode()" style="font-size:0.9rem; padding: 4px 8px;">🌱 Eco: OFF</button>
+      <?php endif; ?>
 
       <!-- Admin Alert Badge -->
       <div id="alert-badge" style="display:none; margin-left: 10px;" class="alert-icon">
@@ -50,7 +54,8 @@ $user_logged  = isset($_SESSION['user_id']);
 
       <?php if ($user_logged): ?>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-          <a href="#admin-panel" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📊 Admin</a>
+          <a href="/admin-orders.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📦 Orders</a>
+          <a href="/admin-insights.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📊 Admin</a>
         <?php endif; ?>
         <a href="/dashboard.php" class="btn btn-primary btn--sm hide-mobile">Dashboard</a>
         <div class="nav__user-menu">

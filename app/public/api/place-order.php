@@ -1,6 +1,6 @@
 <?php
 session_start([
-    'cookie_secure' => false,
+    'cookie_secure'   => false,
     'cookie_httponly' => true,
     'cookie_samesite' => 'Strict',
     'use_strict_mode' => true,
@@ -14,8 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once __DIR__ . '/../../src/helpers/Security.php';
-Security::verify_csrf();
+// CSRF check safe for JSON body (read from header)
+$csrfHeader = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+$csrfSession = $_SESSION['csrf_token'] ?? '';
+if (!$csrfSession || !hash_equals($csrfSession, $csrfHeader)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Security check failed. Please refresh and try again.']);
+    exit;
+}
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -23,8 +29,15 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Block admins from placing orders
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Admins cannot place orders.']);
+    exit;
+}
+
 $input = file_get_contents('php://input');
-$data = json_decode($input, true);
+$data  = json_decode($input, true);
 
 if (!$data || empty($data['items']) || empty($data['address'])) {
     http_response_code(400);

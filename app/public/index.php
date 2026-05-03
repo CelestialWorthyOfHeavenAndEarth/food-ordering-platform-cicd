@@ -243,12 +243,14 @@ $is_admin    = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
                 </span>
                 <div class="dish-row__right">
                   <span class="dish-row__price">₹<?= number_format($dish['price'], 0) ?></span>
+                  <?php if (!$is_admin): ?>
                   <button class="dish-row__add" onclick="Cart.addItem(<?= $dish['id'] ?>, '<?= addslashes($dish['name']) ?>', <?= $dish['price'] ?>)">+ Add</button>
+                  <?php endif; ?>
                 </div>
               </div>
               <?php endforeach; ?>
             </div>
-            <a href="/menu.php?restaurant=<?= $r['id'] ?>" class="btn btn-secondary btn--sm" style="width:100%; margin-top: 1rem; text-align:center;">View Full Menu →</a>
+            <a href="/restaurant.php?id=<?= $r['id'] ?>" class="btn btn-secondary btn--sm" style="width:100%; margin-top: 1rem; text-align:center;">View Full Menu & Reviews →</a>
           </div>
         </div>
         <?php endforeach; ?>
