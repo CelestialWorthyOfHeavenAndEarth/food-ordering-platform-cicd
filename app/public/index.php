@@ -103,9 +103,6 @@ $is_admin    = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
             <a href="/order-track.php" class="feature-pill">📦 Track Order</a>
             <span class="feature-pill" onclick="toggleEcoMode()">🌿 Eco Mode</span>
             <a href="/menu.php" class="feature-pill">🍽️ Full Menu</a>
-            <?php if ($is_admin): ?>
-            <a href="#admin-panel" class="feature-pill active">📊 Admin Panel</a>
-            <?php endif; ?>
           </div>
           <div class="hero__actions">
             <a href="/menu.php" class="btn btn-primary btn--lg">Order Now →</a>
@@ -308,104 +305,6 @@ $is_admin    = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
     </div>
   </section>
 
-  <!-- ADMIN PANEL (Feature 3 + 9 — integrated for admin users) -->
-  <?php if ($is_admin): ?>
-  <section class="section-gap" id="admin-panel">
-    <div class="container">
-      <div class="admin-section">
-        <h2>📊 Admin Intelligence Panel</h2>
-
-        <!-- Stat Cards -->
-        <div class="insights-grid" id="admin-stats">
-          <div class="stat-card"><div class="stat-card__value" id="stat-orders">—</div><div class="stat-card__label">Total Orders</div></div>
-          <div class="stat-card"><div class="stat-card__value" id="stat-revenue">—</div><div class="stat-card__label">Revenue (₹)</div></div>
-          <div class="stat-card"><div class="stat-card__value" id="stat-users">—</div><div class="stat-card__label">Customers</div></div>
-          <div class="stat-card"><div class="stat-card__value" id="stat-restaurants"><?= count($restaurants) ?></div><div class="stat-card__label">Restaurants</div></div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-grid">
-          <div class="chart-box"><h4>Top Dishes (Last 30 Days)</h4><canvas id="topItemsChart"></canvas></div>
-          <div class="chart-box"><h4>Peak Ordering Hours</h4><canvas id="peakHoursChart"></canvas></div>
-          <div class="chart-box"><h4>Revenue Trend</h4><canvas id="revenueChart"></canvas></div>
-          <div class="chart-box"><h4>Delivery Performance</h4><canvas id="deliveryChart"></canvas></div>
-        </div>
-
-        <!-- Alerts -->
-        <div class="alert-list">
-          <h3 style="color:#f87171; margin: 1.5rem 0 0.75rem;">🔔 Active Alerts</h3>
-          <div id="admin-alerts-list"><p style="color:var(--text-muted);">Loading alerts…</p></div>
-        </div>
-
-        <div style="margin-top: 1.5rem; display:flex; gap: 1rem; flex-wrap: wrap;">
-          <a href="/admin-insights.php" class="btn btn-primary">Full Analytics →</a>
-          <a href="/order-track.php" class="btn btn-secondary">Order Management</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <script>
-  // Load admin insights
-  fetch('/api/insights.php').then(r => r.json()).then(data => {
-    if (data.top_items) {
-      document.getElementById('stat-orders').textContent = data.top_items.reduce((a,i) => a + parseInt(i.order_count||0), 0) || '—';
-    }
-    if (data.revenue_trend && data.revenue_trend.length) {
-      const total = data.revenue_trend.reduce((a, r) => a + parseFloat(r.revenue||0), 0);
-      document.getElementById('stat-revenue').textContent = '₹' + Math.round(total).toLocaleString('en-IN');
-    }
-
-    const chartDefaults = { responsive: true, plugins: { legend: { labels: { color: '#aaa' } } }, scales: { x: { ticks: { color: '#aaa' } }, y: { ticks: { color: '#aaa' } } } };
-
-    if (data.top_items?.length) {
-      new Chart(document.getElementById('topItemsChart'), {
-        type: 'bar',
-        data: { labels: data.top_items.map(i => i.dish_name), datasets: [{ label: 'Orders', data: data.top_items.map(i => i.order_count), backgroundColor: '#e94560' }] },
-        options: chartDefaults
-      });
-    }
-    if (data.peak_hours?.length) {
-      new Chart(document.getElementById('peakHoursChart'), {
-        type: 'line',
-        data: { labels: data.peak_hours.map(h => `${h.hour}:00`), datasets: [{ label: 'Orders', data: data.peak_hours.map(h => h.order_count), borderColor: '#a78bfa', fill: true, tension: 0.4 }] },
-        options: chartDefaults
-      });
-    }
-    if (data.revenue_trend?.length) {
-      new Chart(document.getElementById('revenueChart'), {
-        type: 'line',
-        data: { labels: data.revenue_trend.map(r => r.date), datasets: [{ label: '₹ Revenue', data: data.revenue_trend.map(r => r.revenue), borderColor: '#e94560', fill: false, tension: 0.1 }] },
-        options: chartDefaults
-      });
-    }
-    if (data.delivery_perf?.length) {
-      new Chart(document.getElementById('deliveryChart'), {
-        type: 'bar',
-        data: { labels: data.delivery_perf.map(r => r.name), datasets: [{ label: 'Avg Mins', data: data.delivery_perf.map(r => r.avg_time), backgroundColor: '#f59e0b' }] },
-        options: chartDefaults
-      });
-    }
-  }).catch(e => console.error('Insights error', e));
-
-  // Load alerts
-  fetch('/api/alerts.php?action=list').then(r => r.json()).then(data => {
-    const container = document.getElementById('admin-alerts-list');
-    if (data.alerts && data.alerts.length) {
-      container.innerHTML = data.alerts.map(a => `<div class="alert-item">🔔 ${a.message} <small style="opacity:0.6;"> — ${a.created_at}</small></div>`).join('');
-    } else {
-      container.innerHTML = '<p style="color:#22c55e;">✅ No active alerts. System is healthy.</p>';
-    }
-  }).catch(() => {
-    document.getElementById('admin-alerts-list').innerHTML = '<p style="color:var(--text-muted);">Could not load alerts.</p>';
-  });
-
-  // Load user count
-  fetch('/api/insights.php').then(r => r.json()).then(data => {
-    if (data.user_count !== undefined) document.getElementById('stat-users').textContent = data.user_count;
-  });
-  </script>
-  <?php endif; ?>
 
   <!-- CART DRAWER -->
   <?php include __DIR__ . '/../templates/partials/cart-drawer.php'; ?>
@@ -422,10 +321,6 @@ $is_admin    = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
         <a href="/menu.php" style="color: var(--accent-amber);">Menu</a>
         <a href="/meal-builder.php" style="color: var(--accent-amber);">Build Combos</a>
         <a href="/order-track.php" style="color: var(--accent-amber);">Track Order</a>
-        <?php if ($is_admin): ?>
-        <a href="#admin-panel" style="color: #a78bfa;">Admin Panel</a>
-        <a href="/admin-insights.php" style="color: #a78bfa;">Full Analytics</a>
-        <?php endif; ?>
       </div>
     </div>
   </footer>

@@ -12,6 +12,20 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $orderId = (int)($_GET['order_id'] ?? 0);
+
+if ($orderId === 0) {
+    require_once __DIR__ . '/../src/config/Database.php';
+    $db = Database::getConnection();
+    $stmt = $db->prepare("SELECT id FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+    $stmt->execute([$_SESSION['user_id']]);
+    $latest = $stmt->fetchColumn();
+    if ($latest) {
+        $orderId = (int)$latest;
+    } else {
+        header('Location: /dashboard.php');
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -35,7 +35,8 @@ class AuthController {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'] ?? 'customer';
 
-        return ['success' => true, 'redirect' => '/index.php'];
+        $redirectUrl = ($_SESSION['user_role'] === 'admin') ? '/admin-orders.php' : '/dashboard.php';
+        return ['success' => true, 'redirect' => $redirectUrl];
     }
 
     public function logout(): void {
