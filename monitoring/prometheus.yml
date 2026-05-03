@@ -8,6 +8,10 @@ scrape_configs:
       - targets: ['localhost:9090']
 
 
+  - job_name: 'php-fpm'
+    static_configs:
+      - targets: ['feastly_php_fpm_exporter:9253']
+
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']

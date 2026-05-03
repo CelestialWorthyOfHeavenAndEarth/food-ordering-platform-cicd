@@ -23,6 +23,9 @@ RUN apk add --no-cache \
 # PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
+# Enable PHP-FPM status endpoint for Prometheus scraping
+COPY zz-status.conf /usr/local/etc/php-fpm.d/zz-status.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
