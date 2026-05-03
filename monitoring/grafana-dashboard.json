@@ -1,0 +1,304 @@
+{
+  "id": null,
+  "uid": "feastly-monitoring",
+  "title": "Feastly - System & Container Monitoring",
+  "tags": ["feastly", "docker", "cadvisor"],
+  "style": "dark",
+  "timezone": "browser",
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "version": 1,
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total System Memory Usage",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1500000000 },
+              { "color": "red", "value": 2500000000 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{id=\"/\", job=\"cadvisor\"}",
+          "legendFormat": "Total Memory Used",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total System CPU Usage",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "red", "value": 0.8 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "CPU Rate",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Docker Engine CPU",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.3 },
+              { "color": "red", "value": 0.7 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/system.slice/docker.service\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Docker CPU",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Jenkins CI/CD CPU",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.3 },
+              { "color": "red", "value": 0.7 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/system.slice/jenkins.service\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Jenkins CPU",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "System Memory Usage Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{id=\"/\", job=\"cadvisor\"}",
+          "legendFormat": "Total System",
+          "refId": "A"
+        },
+        {
+          "expr": "container_memory_usage_bytes{id=\"/system.slice\", job=\"cadvisor\"}",
+          "legendFormat": "System Services",
+          "refId": "B"
+        },
+        {
+          "expr": "container_memory_usage_bytes{id=\"/system.slice/docker.service\", job=\"cadvisor\"}",
+          "legendFormat": "Docker Engine",
+          "refId": "C"
+        },
+        {
+          "expr": "container_memory_usage_bytes{id=\"/system.slice/jenkins.service\", job=\"cadvisor\"}",
+          "legendFormat": "Jenkins CI/CD",
+          "refId": "D"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "CPU Usage Rate Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Total System CPU",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/system.slice/docker.service\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Docker Engine",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/system.slice/jenkins.service\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Jenkins",
+          "refId": "C"
+        },
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{id=\"/system.slice/containerd.service\", job=\"cadvisor\"}[5m])",
+          "legendFormat": "Containerd Runtime",
+          "refId": "D"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Network Receive Bytes (All Containers)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_network_receive_bytes_total{job=\"cadvisor\"}[5m])",
+          "legendFormat": "{{id}} RX",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Network Transmit Bytes (All Containers)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(container_network_transmit_bytes_total{job=\"cadvisor\"}[5m])",
+          "legendFormat": "{{id}} TX",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Prometheus Scrape Duration (Health Check)",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "expr": "scrape_duration_seconds",
+          "legendFormat": "{{job}} scrape duration",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    }
+  ]
+}
