@@ -33,9 +33,9 @@ class AuthController {
         session_regenerate_id(true);
         $_SESSION['user_id']   = $user['id'];
         $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_role'] = $user['role'] ?? 'customer';
+        $_SESSION['role'] = $user['role'] ?? 'customer';
 
-        $redirectUrl = ($_SESSION['user_role'] === 'admin') ? '/admin-orders.php' : '/dashboard.php';
+        $redirectUrl = ($_SESSION['role'] === 'admin') ? '/admin-orders.php' : '/dashboard.php';
         return ['success' => true, 'redirect' => $redirectUrl];
     }
 
@@ -55,7 +55,7 @@ class AuthController {
 
     public static function requireAdmin(): void {
         self::requireLogin();
-        if ($_SESSION['user_role'] !== 'admin') {
+        if (($_SESSION['role'] ?? '') !== 'admin') {
             http_response_code(403);
             die('Access denied');
         }
