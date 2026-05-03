@@ -36,18 +36,15 @@ $is_admin    = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 <body>
   <?php include __DIR__ . '/../templates/layout/nav.php'; ?>
 
-  <div class="admin-hero">
+  <div class="admin-topbar" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 2rem 0 1.5rem; border-bottom: 1px solid rgba(139,92,246,0.3);">
     <div class="container">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <h1>📊 Admin Intelligence Dashboard</h1>
-          <p>AI-powered insights, real-time alerts, and performance analytics for Feastly.</p>
-        </div>
-        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-          <a href="/index.php" class="btn btn-secondary">← Back to Store</a>
-          <a href="/order-track.php" class="btn btn-primary">Order Management</a>
-        </div>
-      </div>
+      <h1 style="color: #a78bfa; font-size: 1.8rem; margin: 0 0 0.25rem;">📊 Admin Intelligence Dashboard</h1>
+      <p style="color: var(--text-muted); margin: 0;">AI-powered insights, real-time alerts, and performance analytics for Feastly.</p>
+      <nav class="admin-nav" style="display: flex; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap;">
+        <a href="/admin-orders.php" style="color: #a78bfa; text-decoration: none; font-size: 0.9rem; padding: 0.4rem 0.9rem; border: 1px solid rgba(139,92,246,0.3); border-radius: 20px;">📦 Orders</a>
+        <a href="/admin-restaurants.php" style="color: #a78bfa; text-decoration: none; font-size: 0.9rem; padding: 0.4rem 0.9rem; border: 1px solid rgba(139,92,246,0.3); border-radius: 20px;">🏪 Restaurants</a>
+        <a href="/admin-insights.php" class="active" style="background: #a78bfa; color: #0f172a; font-weight: 600; text-decoration: none; font-size: 0.9rem; padding: 0.4rem 0.9rem; border: 1px solid rgba(139,92,246,0.3); border-radius: 20px;">📊 Analytics</a>
+      </nav>
     </div>
   </div>
 
