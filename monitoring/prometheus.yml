@@ -7,9 +7,6 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'php-fpm'
-    static_configs:
-      - targets: ['feastly_php_prod:9253'] # Assuming we'll add php-fpm-exporter if needed. We don't have one right now, but Prometheus is set up.
 
   - job_name: 'cadvisor'
     static_configs:
