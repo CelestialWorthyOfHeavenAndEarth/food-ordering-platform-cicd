@@ -53,10 +53,7 @@ $user_logged  = isset($_SESSION['user_id']);
       <button id="eco-toggle" class="btn btn-ghost hide-mobile" onclick="toggleEcoMode()" style="font-size:0.9rem; padding: 4px 8px;">🌱 Eco: OFF</button>
       <?php endif; ?>
 
-      <!-- Admin Alert Badge -->
-      <div id="alert-badge" style="display:none; margin-left: 10px;" class="alert-icon">
-        <a href="/admin-insights.php" style="text-decoration:none;">🔔 <span id="alert-count" style="background:var(--accent-coral); color:white; border-radius:50%; padding:2px 6px; font-size:0.75rem;">0</span></a>
-      </div>
+      <!-- Admin Alert Badge Removed -->
 
       <?php if ($user_logged): ?>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
@@ -177,20 +174,5 @@ if (localStorage.getItem('eco_mode') === '1') {
 }
 
 
-// Admin Alerts Polling
-setInterval(async () => {
-  try {
-    const res  = await fetch('/api/alerts.php?action=list');
-    const data = await res.json();
-    const badge = document.getElementById('alert-badge');
-    if (data.count > 0 && badge) {
-      document.getElementById('alert-count').textContent = data.count;
-      badge.style.display = 'inline-block';
-    } else if (badge) {
-      badge.style.display = 'none';
-    }
-  } catch(e) {
-    console.error("Alerts polling failed", e);
-  }
-}, 60000); // check every minute
+
 </script>

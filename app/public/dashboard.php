@@ -91,7 +91,7 @@ if (isset($_GET['logout'])) {
                     </td>
                     <td style="padding: 16px 0; font-weight: 600;">₹<?= number_format($order['total_amount'], 2) ?></td>
                     <td style="padding: 16px 0; text-align: right;">
-                      <a href="/order-track.php?order_id=<?= $order['id'] ?>" class="btn btn-secondary btn--sm" style="padding: 4px 12px; font-size: 0.8rem;">Track</a>
+                      <!-- Track feature disabled for now -->
                     </td>
                   </tr>
                 <?php endforeach; ?>
