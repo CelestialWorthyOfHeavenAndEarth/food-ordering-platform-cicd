@@ -16,17 +16,23 @@ $user_logged  = isset($_SESSION['user_id']);
 
     <!-- Desktop Links -->
     <ul class="nav__links hide-mobile">
-      <li><a href="/menu.php"     class="nav__link <?= $current_page==='menu'?'active':'' ?>">Menu</a></li>
-      <li><a href="/meal-builder.php" class="nav__link <?= $current_page==='meal-builder'?'active':'' ?>">Combos</a></li>
-      <li><a href="/about.php"    class="nav__link <?= $current_page==='about'?'active':'' ?>">About</a></li>
-      <li><a href="/contact.php"  class="nav__link <?= $current_page==='contact'?'active':'' ?>">Contact</a></li>
+      <?php if (!($user_logged && ($_SESSION['role'] ?? '') === 'admin')): ?>
+        <li><a href="/menu.php"     class="nav__link <?= $current_page==='menu'?'active':'' ?>">Menu</a></li>
+        <li><a href="/meal-builder.php" class="nav__link <?= $current_page==='meal-builder'?'active':'' ?>">Combos</a></li>
+        <li><a href="/about.php"    class="nav__link <?= $current_page==='about'?'active':'' ?>">About</a></li>
+        <li><a href="/contact.php"  class="nav__link <?= $current_page==='contact'?'active':'' ?>">Contact</a></li>
+      <?php endif; ?>
     </ul>
 
     <!-- Smart Search -->
+    <?php if (!($user_logged && ($_SESSION['role'] ?? '') === 'admin')): ?>
     <div class="smart-search hide-mobile" style="position:relative; margin-left:1rem; margin-right:1rem; flex-grow:1; max-width:300px;">
       <input type="text" id="search-input" placeholder="Try 'spicy chicken under 200'..." style="width:100%; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:0.9rem;">
       <div id="search-results" class="results-dropdown" style="position:absolute; top:100%; left:0; right:0; background:var(--surface-light); border-radius:8px; margin-top:8px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:100; max-height:400px; overflow-y:auto; display:none;"></div>
     </div>
+    <?php else: ?>
+    <div style="flex-grow:1;"></div>
+    <?php endif; ?>
 
     <!-- Actions -->
     <div class="nav__actions">
@@ -55,9 +61,11 @@ $user_logged  = isset($_SESSION['user_id']);
       <?php if ($user_logged): ?>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
           <a href="/admin-orders.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📦 Orders</a>
-          <a href="/admin-insights.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📊 Admin</a>
+          <a href="/admin-restaurants.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">🏪 Restaurants</a>
+          <a href="/admin-insights.php" class="btn btn-ghost btn--sm hide-mobile" style="color:#a78bfa; border:1px solid #a78bfa;">📊 Analytics</a>
+        <?php else: ?>
+          <a href="/dashboard.php" class="btn btn-primary btn--sm hide-mobile">Dashboard</a>
         <?php endif; ?>
-        <a href="/dashboard.php" class="btn btn-primary btn--sm hide-mobile">Dashboard</a>
         <div class="nav__user-menu">
           <button class="nav__avatar" id="userMenuToggle">
             <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
@@ -85,11 +93,12 @@ $user_logged  = isset($_SESSION['user_id']);
 
   <!-- Mobile Menu Overlay -->
   <div class="nav__mobile-menu" id="mobileMenu">
-    <ul>
-      <li><a href="/menu.php">Menu</a></li>
-      <li><a href="/meal-builder.php">Combos</a></li>
-      <li><a href="/about.php">About</a></li>
-      <li><a href="/contact.php">Contact</a></li>
+      <?php if (!($user_logged && ($_SESSION['role'] ?? '') === 'admin')): ?>
+        <li><a href="/menu.php">Menu</a></li>
+        <li><a href="/meal-builder.php">Combos</a></li>
+        <li><a href="/about.php">About</a></li>
+        <li><a href="/contact.php">Contact</a></li>
+      <?php endif; ?>
       <?php if (!$user_logged): ?>
         <li><a href="/login.php" class="btn btn-secondary" style="margin-top:8px;">Sign In</a></li>
         <li><a href="/register.php" class="btn btn-primary" style="margin-top:8px;">Get Started</a></li>
