@@ -110,7 +110,6 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: feastly_cadvisor
     privileged: true
-    cgroupns_mode: host
     pid: host
     devices:
       - /dev/kmsg:/dev/kmsg
