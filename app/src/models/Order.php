@@ -22,7 +22,27 @@ class Order {
 
         $stmtItem = $db->prepare("INSERT INTO order_items (order_id, menu_item_id, quantity, unit_price) VALUES (?, ?, ?, ?)");
         foreach ($data['items'] as $item) {
-            $stmtItem->execute([$orderId, $item['id'], $item['quantity'], $item['price']]);
+            if (is_string($item['id']) && strpos($item['id'], 'combo_') === 0) {
+                $comboId = (int)str_replace('combo_', '', $item['id']);
+                $stmt = $db->prepare("SELECT items, discount_percentage FROM meal_combos WHERE id = ?");
+                $stmt->execute([$comboId]);
+                $combo = $stmt->fetch();
+                if ($combo) {
+                    $comboItems = json_decode($combo['items'], true);
+                    $discountMult = 1 - ($combo['discount_percentage'] / 100);
+                    $placeholders = implode(',', array_fill(0, count($comboItems), '?'));
+                    $itemPricesStmt = $db->prepare("SELECT id, price FROM menu_items WHERE id IN ($placeholders)");
+                    $itemPricesStmt->execute($comboItems);
+                    $dbItems = $itemPricesStmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    foreach ($dbItems as $dbItem) {
+                        $discountedPrice = $dbItem['price'] * $discountMult;
+                        $stmtItem->execute([$orderId, $dbItem['id'], $item['quantity'], $discountedPrice]);
+                    }
+                }
+            } else {
+                $stmtItem->execute([$orderId, $item['id'], $item['quantity'], $item['price']]);
+            }
         }
 
         $stmtStatus = $db->prepare("INSERT INTO order_status (order_id, status) VALUES (?, 'placed')");
