@@ -28,7 +28,13 @@ if ($method === 'GET') {
     if ($action === 'get') {
         $id = (int)($_GET['id'] ?? 0);
         $restaurant = Database::query('SELECT * FROM restaurants WHERE id = ?', [$id])->fetch();
-        $menu = Database::query('SELECT * FROM menu_items WHERE restaurant_id = ? ORDER BY category, name', [$id])->fetchAll();
+        $menu = Database::query('
+            SELECT m.*, c.name as category 
+            FROM menu_items m 
+            LEFT JOIN categories c ON m.category_id = c.id 
+            WHERE m.restaurant_id = ? 
+            ORDER BY c.name, m.name
+        ', [$id])->fetchAll();
         echo json_encode(['restaurant' => $restaurant, 'menu' => $menu]);
         exit;
     }
