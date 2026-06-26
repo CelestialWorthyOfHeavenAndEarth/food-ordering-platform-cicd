@@ -79,7 +79,13 @@ pipeline {
                 sh '''
                     echo "Deploying directly from Jenkins workspace..."
                     
-                    cp .env.example .env
+                    if [ -f /home/ubuntu/feastly/.env ]; then
+                        echo "Copying production .env from host..."
+                        cp /home/ubuntu/feastly/.env .env
+                    else
+                        echo "Warning: Production .env not found on host. Using .env.example..."
+                        cp .env.example .env
+                    fi
                     
                     # Stop old containers and start new ones
                     docker-compose -f docker-compose.prod.yml down || true
